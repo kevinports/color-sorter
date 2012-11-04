@@ -1,0 +1,53 @@
+html, body{
+	margin: 0;
+	padding: 0;
+}
+
+html, body, .controls, .canvas{
+    height: 100%;
+}
+.controls, .canvas{
+    float:left;
+}
+.controls{
+    width: 260px;
+    background: #F0F0F0;
+}
+.controls > div{
+	padding:20px;
+}
+.controls img{
+	width:100%;
+}
+.image-title{
+	text-transform: uppercase;
+	font-size: 11px;
+}
+.thumb {
+  height:75px;
+  border: 1px solid #000;
+  margin: 10px 0 0;
+}
+
+.control-group{
+	padding: 40px 0;
+}
+.control-group label{
+	display:block;
+}
+.control-group input{
+	width:100%;
+}
+h4{
+	margin: 0;
+}
+
+.stat{
+	font-size: 36px;
+	letter-spacing: -1px;
+	margin-bottom:40px;
+}
+
+.buffer-canvas {
+	display:none;
+}
