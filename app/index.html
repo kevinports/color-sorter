@@ -39,12 +39,33 @@
 
         <!-- endbuild -->
 
+
+
+
         <script type="text/x-mustache" id="controls-template">
             <div>
-                <h4>Controls</h4>
-                <div id="coordinates" class="control-group">
+                <div class="control-group">
                     <label> Resolution:</label>
-                    <input type="range" min="2" max="100" id="resolution" >
+                    <input type="range" min="2" max="200" id="resolution" >
+                </div>
+                <div id="sort-by" class="control-group">
+                    <label> Sort by:</label>
+                    <label class="radio">
+                      <input type="radio" name="colorRadios" value="no-sort" checked>
+                      None
+                    </label>
+                    <label class="radio">
+                      <input type="radio" name="colorRadios" value="hue">
+                      Hue
+                    </label>
+                    <label class="radio">
+                      <input type="radio" name="colorRadios" value="saturation">
+                      Saturation
+                    </label>
+                   <label class="radio">
+                      <input type="radio" name="colorRadios" value="lightness">
+                        Lightness
+                    </label>
                 </div>
                 <img src="img/{{ image }}" id="imageClick">
                 <span class="image-title">{{ image }}</span>

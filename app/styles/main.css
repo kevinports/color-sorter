@@ -14,10 +14,11 @@ html, body, .controls, .canvas{
     background: #F0F0F0;
 }
 .controls > div{
-	padding:20px;
+	padding:40px 20px 20px;
 }
 .controls img{
 	width:100%;
+	margin-top: 16px;
 }
 .image-title{
 	text-transform: uppercase;
@@ -30,12 +31,21 @@ html, body, .controls, .canvas{
 }
 
 .control-group{
-	padding: 40px 0;
+	margin-bottom: 40px ;
 }
 .control-group label{
+	font-family:'Helvetica Neue', sans-serif;
+	font-weight:bold;
+	font-size: 15px;
+	padding-bottom:8px;
 	display:block;
 }
-.control-group input{
+label.radio {
+	font-weight: normal;
+	font-size: 14px;
+	padding-bottom:2px;
+}
+input#resolution{
 	width:100%;
 }
 h4{
