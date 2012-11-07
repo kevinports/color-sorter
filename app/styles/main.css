@@ -1,6 +1,8 @@
 html, body{
 	margin: 0;
 	padding: 0;
+	z-index:1;
+	font-family:'Helvetica Neue', sans-serif;
 }
 
 html, body, .controls, .canvas{
@@ -14,27 +16,12 @@ html, body, .controls, .canvas{
     background: #F0F0F0;
 }
 .controls > div{
-	padding:40px 20px 20px;
+	padding:20px 20px;
 }
-.controls img{
-	width:100%;
-	margin-top: 16px;
-}
-.image-title{
-	text-transform: uppercase;
-	font-size: 11px;
-}
-.thumb {
-  height:75px;
-  border: 1px solid #000;
-  margin: 10px 0 0;
-}
-
 .control-group{
 	margin-bottom: 40px ;
 }
 .control-group label{
-	font-family:'Helvetica Neue', sans-serif;
 	font-weight:bold;
 	font-size: 15px;
 	padding-bottom:8px;
@@ -45,7 +32,7 @@ label.radio {
 	font-size: 14px;
 	padding-bottom:2px;
 }
-input#resolution{
+input[type="range"]{
 	width:100%;
 }
 h4{
@@ -61,3 +48,53 @@ h4{
 .buffer-canvas {
 	display:none;
 }
+#thumbnail {
+	margin-bottom: 50px;
+}
+.controls img{
+	width:100%;
+}
+.image-title{
+	text-transform: uppercase;
+	font-size: 11px;
+}
+#thumbnail.load{
+	background:#DDDDDD;
+	width:100%;
+	text-align: center;
+	padding:40px 0;
+}
+#thumbnail.load img, #thumbnail.load .image-title{
+	display:none;
+}
+
+
+#dropzone{
+	background:#DDDDDD;
+	width:100%;
+	text-align: center;
+	padding:40px 0;
+}
+
+.loadingText{
+	font-size: 13px;
+	color:#666;
+}
+.loading:before{
+	content:'';
+	z-index:1000;
+	position: absolute;
+     left: 0px;
+     top: 0px;
+     width:100%;
+     height:100%;
+	height:100%;
+	background:rgba(0,0,0,.85) url('../img/loader.gif') no-repeat center center;
+}
+.hide{
+	display:none;
+}
+
+
+
+
