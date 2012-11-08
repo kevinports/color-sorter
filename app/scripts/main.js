@@ -27,11 +27,10 @@ $(document).ready(function(){
 		className: 'buffer-canvas',
 
 		initialize: function(options){
-			_.bindAll(this, 'render','updatePhoto');
+			_.bindAll(this, 'render');
 			this.vent = options.vent;
 			this.bind('progress', this.progress);
 			this.bind('complete', this.complete);
-			options.vent.bind("updatePhoto", this.updatePhoto);
 		},
 		render: function(){
 			var that = this,
@@ -41,6 +40,10 @@ $(document).ready(function(){
 			width = model.get('cWidth'),
 			height = model.get('cHeight'),
 			url = model.get('image');
+
+			if(!url){
+				return false;
+			}
 
 			$(canvas).attr({
 				'width': width,
@@ -66,10 +69,8 @@ $(document).ready(function(){
 				}
 
 				model.set({imageColor: colors})	
-
 				that.trigger('complete')
 			}
-
 
 			image.src = url;
 			this.trigger('progress')
@@ -77,24 +78,23 @@ $(document).ready(function(){
 			function RGBToHSL(rgb){
 				var r = rgb[0], g = rgb[1], b = rgb[2];
 
-				 r /= 255, g /= 255, b /= 255;
-				    var max = Math.max(r, g, b), min = Math.min(r, g, b);
-				    var h, s, l = (max + min) / 2;
+				r /= 255, g /= 255, b /= 255;
+				var max = Math.max(r, g, b), min = Math.min(r, g, b);
+				var h, s, l = (max + min) / 2;
 
-				    if(max == min){
-				        h = s = 0; // achromatic
-				    }else{
-				        var d = max - min;
-				        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-				        switch(max){
-				            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-				            case g: h = (b - r) / d + 2; break;
-				            case b: h = (r - g) / d + 4; break;
-				        }
-				        h /= 6;
-				    }
-
-				    return [Math.floor(h * 360), Math.floor(s * 100), Math.floor(l * 100)];
+				if(max == min){
+				  h = s = 0; // achromatic
+				}else{
+					var d = max - min;
+					s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+					switch(max){
+						case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+						case g: h = (b - r) / d + 2; break;
+						case b: h = (r - g) / d + 4; break;
+					}
+					h /= 6;
+				}
+				return [Math.floor(h * 360), Math.floor(s * 100), Math.floor(l * 100)];
 			}
 
 			return this;
@@ -107,30 +107,30 @@ $(document).ready(function(){
 		complete: function(){
 			this.vent.trigger("complete", this.model);
 			console.log('complete')
-		},
-		updatePhoto: function(){
-			this.render();
 		}
 	});
 
 	window.controlView = Backbone.View.extend({
     tagName: 'div', 
     className: 'controls',
-	template: $('#controls-template').html(),
-	events: {
+		template: $('#controls-template').html(),
+		events: {
 	    'mouseup #resolution': 'resolution',
 	    'mouseup #remix': 'remix',
 	    'click #save-image': 'saveImage',
 	    'dragover #dropzone': 'zoneDragover',
 	    'drop #dropzone': 'zoneDrop',
+	    'dragenter #dropzone': 'zoneDragenter',
+	    'dragleave #dropzone': 'zoneDragleave',
 	    'change #sort-by': 'sortBy'
   	},
     initialize: function(options){
       _.bindAll(this, 'render','resolution','progress','complete','zoneDrop');
       options.vent.bind("progress", this.progress);
       options.vent.bind("complete", this.complete);
-      this.bind('updatePhoto', this.updatePhoto);
       this.vent = options.vent;
+      this.bind('newPhoto', this.newPhoto);
+      this.bind('progress', this.progress);
     },
     render: function(){
 	  	$(this.el).html(Mustache.to_html(this.template, this.model.toJSON()));
@@ -140,8 +140,7 @@ $(document).ready(function(){
 			this.model.set({cWidth: w, cHeight: h});
 
 			var bufferCanvas = new bufferCanvasView({model: this.model, vent: vent});
-      $(this.el).append(bufferCanvas.render().el)
-		
+      $(this.el).append(bufferCanvas.render().el);
 
       return this; 
     },
@@ -163,63 +162,59 @@ $(document).ready(function(){
     saveImage: function(){
     	this.vent.trigger('saveImage', this.model);
     },
-    zoneDragover:function(event){
-		event.stopPropagation();
-	  	event.preventDefault();
+    zoneDragenter:function(e){
+    	if(e.target.tagName == 'IMG'){
+    		$(e.target).parent().addClass('drop-over');
+    	}
+	  	$(e.target).addClass('drop-over');
+    },
+    zoneDragleave:function(e){
+	  	$(e.target).removeClass('drop-over');
+    },
+    zoneDragover:function(e){
+			e.stopPropagation();
+	  	e.preventDefault();
     },
     zoneDrop: function(e){
     	e.stopPropagation();
-		e.preventDefault();
-
-		this.trigger("zoneDrop", e.originalEvent.dataTransfer);
-		var files = e.originalEvent.dataTransfer.files,
+			e.preventDefault();
+			
+			this.trigger("zoneDrop", e.originalEvent.dataTransfer);
+			var files = e.originalEvent.dataTransfer.files,
 			that = this;
 
 	    // Loop through the FileList and render image files as thumbnails.
 	    for (var i = 0, f; f = files[i]; i++) {
 
 	      // Only process image files.
-	      if (!f.type.match('image.*')) {
-	        continue;
+	      if (f.type.match('image.*')) {
+	      	this.trigger('newPhoto');
+		      var reader = new FileReader();
+
+		      // Closure to capture the file information.
+		      reader.onload = (function(theFile) {
+		        return function(e) {
+		          localStorage.setItem('img', e.target.result);
+		          var loded = localStorage.getItem('img');	
+		          that.model.set({image: loded});
+		          that.vent.trigger('updateUI', that.model);
+		    	  	that.render();
+		        };
+		      })(f);
+
+		      // Read in the image file as a data URL.
+		      reader.readAsDataURL(f);
+	     
+	      } else {
+	      	return false;
 	      }
 
-	      var reader = new FileReader();
-
-	      // Closure to capture the file information.
-	      reader.onload = (function(theFile) {
-	        return function(e) {
-	          // Render thumbnail.
-	          // var span = document.createElement('span');
-	          // span.html().remove();
-	          // span.innerHTML = ['<img class="thumb" src="', e.target.result,
-	          //                   '" title="', escape(theFile.name), '"/>'].join('');
-
-	          // document.getElementById('list').insertBefore(span, null);
-	          
-	          localStorage.setItem('img', e.target.result);
-	          that.render();
-	          	
-	        };
-	      })(f);
-
-	      // Read in the image file as a data URL.
-	      reader.readAsDataURL(f);
-
-
 	    }
-	    this.trigger('updatePhoto')
-	    this.vent.trigger('updateUI', that.model);
-	    this.render();
-
     },
-	updatePhoto: function(){
-		this.vent.trigger('updatePhoto', this.model);
-		console.log('update photo')
-	},
     sortBy: function(evt){
     	var target = $(evt.currentTarget),
-    		checked = target.find(':checked'),
-    		sortMode = checked.attr('value')
+    			checked = target.find(':checked'),
+    			sortMode = checked.attr('value');
     	this.model.set({sortMode: sortMode});
     	this.vent.trigger('updateUI', this.model);
     },
@@ -230,16 +225,20 @@ $(document).ready(function(){
     	$(this.el).find('#thumbnail').removeClass('load');
     	$(this.el).find('.loadingText').addClass('hide');
     	this.vent.trigger('updateUI', this.model);
+    },
+    newPhoto: function(){
+    	this.vent.trigger("newPhoto", this.model);
     }
   });
 
 	window.canvasView = Backbone.View.extend({
     tagName: 'canvas', 
     template: $('#canvas-template').html(),
+
     initialize: function(options){
-      	_.bindAll(this, 'render','updateUI','saveImage'); 
-		options.vent.bind('updateUI', this.updateUI);
-		options.vent.bind('saveImage', this.saveImage);
+	    _.bindAll(this, 'render','updateUI','saveImage'); 
+			options.vent.bind('updateUI', this.updateUI);
+			options.vent.bind('saveImage', this.saveImage);
     },
 
 	  render: function(){
@@ -332,16 +331,20 @@ $(document).ready(function(){
 		el: 'body',
 		initialize: function(options){
 			_.bindAll(this, "progress", "complete");
+			options.vent.bind("newPhoto", this.newPhoto);
 			options.vent.bind("progress", this.progress);
 			options.vent.bind("complete", this.complete);
 			this.render();
 		},
   		render: function(){
-			var controls = new controlView({model: new uiDataModel, vent: vent});
+					var controls = new controlView({model: new uiDataModel, vent: vent});
       		$(this.el).append(controls.render().el);
 
-			var canvas = new canvasView({model: new canvasModel, vent: vent});
-      			$(this.el).append(canvas.render().el);
+					var canvas = new canvasView({model: new canvasModel, vent: vent});
+      		$(this.el).append(canvas.render().el);
+    	},
+    	newPhoto: function(){
+    		$('body').addClass('loading')
     	},
     	progress: function(){
     		$(this.el).addClass('loading')
@@ -353,5 +356,9 @@ $(document).ready(function(){
 	});
 
   var app = new appView({vent: vent});
+
+  $('a.btn-primary').live('click', function(){
+  	$('.home').fadeOut('slow');
+  })
 
 });

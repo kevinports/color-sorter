@@ -17,6 +17,15 @@
             <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
         <![endif]-->
 
+
+
+        <div class="home">
+            <h1>Color Sorter App</h1>
+            <a class="btn-primary" href="#">Launch App</a>
+        </div>
+
+
+
         <script src="scripts/vendor/canvas2image.js"></script>
         <script src="scripts/vendor/base64.js"></script>
 
@@ -36,8 +45,20 @@
         <script type="text/x-mustache" id="controls-template">
             <div>
                 <div id="thumbnail">
-                    <img src="{{ image }}" id="">
-                    <!-- <span class="image-title">{{ image }}</span> -->
+                    
+                    {{ #image }}
+                    <div id="dropzone">
+                        <img src="{{ image }}" id="">
+                        <img src="img/drop.png" class="drop-i">
+                    </div>
+                    {{ /image }}
+                    {{ ^image }}
+                    <div id="dropzone" class="upload-prompt">
+                        <span>Drop an image</span>
+                        <img src="img/drop.png" class="drop-i">
+                    </div>
+                    {{ /image }}
+                    
                 </div>
                 <div class="control-group">
                     <label> Resolution:</label>
@@ -69,19 +90,18 @@
                 <div class="control-group">
                     <button id="save-image">Save PNG</button>
                 </div>
-                <div class="control-group">
-                    <div id="dropzone">
-                    Drop here.
-                    </div>
-                </div>
                 
             </div>
         </script>
         
         <script type="text/x-mustache" id="canvas-template"> 
-                {{ #data }}
-                <h1 class="stat">{{ data.attributes.res }}</h1>
-                {{ /data }}
+            {{ #data }}
+            <h1 class="stat">{{ data.attributes.res }}</h1>
+            {{ /data }}
+        </script>
+
+        <script type="text/x-mustache" id="home-template"> 
+
         </script>
     </body>
 </html>

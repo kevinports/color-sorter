@@ -19,7 +19,7 @@ html, body, .controls, .canvas{
 	padding:20px 20px;
 }
 .control-group{
-	margin-bottom: 40px ;
+	margin-bottom: 20px ;
 }
 .control-group label{
 	font-weight:bold;
@@ -54,32 +54,63 @@ h4{
 .controls img{
 	width:100%;
 }
+#dropzone{
+	background:#DDDDDD;
+	width:100%;
+	text-align: center;
+}
+#dropzone img.drop-i{
+	display: none;
+}
+.drop-over{
+	position:relative;
+	z-index:100;
+	display:block;
+}
+.drop-over:after{
+	content:'';
+	z-index:1000;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width:100%;
+	height:100%;
+	background:rgba(0,0,0,.65) url('../img/drop.gif') no-repeat center center;
+}
+#dropzone.drop-over img.drop-i{
+	z-index:2000;
+	position: absolute;
+	display: block;
+	left: 50%;
+	top: 50%;
+	margin-left:-20px;
+	width:40px;
+	height:40px;
+	margin-top:-20px;
+}
+img.drop-i{
+		transition: top 2s;
+   -moz-transition: top 2s; /* Firefox 4 */
+-webkit-transition: top 2s; /* Safari and Chrome */
+     -o-transition: top 2s; /* Opera */
+}
+
 .image-title{
 	text-transform: uppercase;
 	font-size: 11px;
 }
-#thumbnail.load{
+#thumbnail.load, .upload-prompt{
 	background:#DDDDDD;
 	width:100%;
 	text-align: center;
 	padding:40px 0;
+	font-size: 13px;
+	color:#666;
 }
 #thumbnail.load img, #thumbnail.load .image-title{
 	display:none;
 }
 
-
-#dropzone{
-	background:#DDDDDD;
-	width:100%;
-	text-align: center;
-	padding:40px 0;
-}
-
-.loadingText{
-	font-size: 13px;
-	color:#666;
-}
 .loading:before{
 	content:'';
 	z-index:1000;
@@ -88,11 +119,23 @@ h4{
      top: 0px;
      width:100%;
      height:100%;
-	height:100%;
 	background:rgba(0,0,0,.85) url('../img/loader.gif') no-repeat center center;
 }
-.hide{
+.hide {
 	display:none;
+}
+
+.home {
+	width:100%;
+	height:100%;
+	background: #333;
+	padding-top: 200px;
+	text-align: center;
+	z-index: 5000;
+	position:absolute;
+	top:0;
+	left:0
+
 }
 
 
