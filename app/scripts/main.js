@@ -131,18 +131,29 @@ $(document).ready(function(){
       this.vent = options.vent;
       this.bind('newPhoto', this.newPhoto);
       this.bind('progress', this.progress);
+      this.bind('resize', this.resize);
     },
     render: function(){
 	  	$(this.el).html(Mustache.to_html(this.template, this.model.toJSON()));
 
 	  	var h = $(window).height(),
 			w = $(window).width() - 260;
-			this.model.set({cWidth: w, cHeight: h});
+			this.model.set({cWidth: w, cHeight: h}),
+			that = this;
 
 			var bufferCanvas = new bufferCanvasView({model: this.model, vent: vent});
-      $(this.el).append(bufferCanvas.render().el);
+      		$(this.el).append(bufferCanvas.render().el);
 
+      		$(window).resize(function() {
+      			h = $(window).height();
+				w = $(window).width() - 260;
+				that.model.set({cWidth: w, cHeight: h});
+      			that.trigger('resize')
+      		})
       return this; 
+    },
+    resize: function(){
+    	this.vent.trigger('updateUI', this.model);
     },
     updateUI: function(){
     	this.vent.trigger('updateUI', this.model);
